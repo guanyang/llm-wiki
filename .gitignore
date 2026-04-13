@@ -1,0 +1,14 @@
+.obsidian
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.claude/
+.agent/
+.worktrees/
+.private-journal/
+node_modules/
+copilot
+
+private
+local
