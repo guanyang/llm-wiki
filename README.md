@@ -1,221 +1,280 @@
-# LLM Wiki — 个人知识库
+# LLM Wiki — Personal Knowledge Base
 
-**简体中文** | [English](README.en.md)
+**English** | [简体中文](README.zh.md)
 
-一个基于 Obsidian + LLM Wiki 持续维护的个人知识库。灵感来自 [Karpathy 的 LLM Wiki 模式](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)。
+A personal knowledge base continuously maintained with Obsidian + LLM Wiki. Inspired by [Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 
-核心理念：知识不是每次查询时从零推导，而是被**编译一次、持续积累**。人类负责策展素材和提出问题，LLM 负责所有繁琐的整理工作——摘要、交叉引用、归档、一致性维护。
+Core idea: Knowledge is not derived from scratch on every query — it is **compiled once and continuously accumulated**. Humans curate materials and ask questions; the LLM handles all the tedious organization work — summarization, cross-referencing, archiving, and consistency maintenance.
 
-## 与传统 RAG 的区别
+## How It Differs from Traditional RAG
 
-| | 传统 RAG | LLM Wiki |
+| | Traditional RAG | LLM Wiki |
 |---|---|---|
-| 知识存储 | 原始文档 + 向量索引 | 结构化、互相链接的 Markdown 页面 |
-| 查询方式 | 每次从零检索、拼凑 | 基于已编译的知识综合回答 |
-| 知识积累 | 无——每次重新推导 | 有——每次操作都让 wiki 更丰富 |
-| 交叉引用 | 无 | 自动维护的 `[[双链]]` 网络 |
-| 矛盾处理 | 不感知 | 主动标注、注明来源 |
+| Knowledge Storage | Raw documents + vector index | Structured, interlinked Markdown pages |
+| Query Method | Retrieve and assemble from scratch each time | Answer based on pre-compiled knowledge |
+| Knowledge Accumulation | None — re-derived every time | Yes — every operation makes the wiki richer |
+| Cross-references | None | Automatically maintained `[[wikilink]]` network |
+| Contradiction Handling | Unaware | Proactively annotated with sources cited |
 
-## 架构
+## Architecture
 
 ```
-├── AGENTS.md          # Schema 规范（OpenAI Codex 等通用 Agent）
-├── CLAUDE.md          # Schema 规范（Claude Code 适配）
-├── GEMINI.md          # Schema 规范（Gemini CLI 适配）
-├── raw/               # 原始素材（人类策展，LLM 只读）
-│   ├── articles/      # 网络文章、博客
-│   ├── papers/        # 学术论文、白皮书
-│   ├── docs/          # 官方文档摘录
-│   ├── transcripts/   # 会议记录、演讲稿、播客笔记
-│   └── assets/        # 图片、图表、数据文件
-├── wiki/              # LLM 编译产物（LLM 读写，人类只读）
-│   ├── index.md       # 全局索引
-│   ├── log.md         # 操作日志
-│   ├── entities/      # 实体页（工具、框架、人物）
-│   ├── concepts/      # 概念页（模式、方法论）
-│   ├── summaries/     # 素材摘要页
-│   ├── comparisons/   # 对比分析页
-│   └── synthesis/     # 综合分析页
-└── output/            # 成品输出（LLM 生成，人类审核定稿）
-    ├── posts/         # 博客文章、公众号文章
-    ├── reports/       # 研究报告、技术调研报告
-    ├── slides/        # 演示文稿（Marp 格式）
-    ├── tutorials/     # 教程、手把手指南
-    └── newsletters/   # 周报、月报、知识简报
+├── AGENTS.md          # Schema spec (OpenAI Codex and other general agents)
+├── CLAUDE.md          # Schema spec (Claude Code adaptation)
+├── GEMINI.md          # Schema spec (Gemini CLI adaptation)
+├── skills/                # Agent Skills (detailed workflow rules, loaded on demand)
+│   └── llm-wiki/          # LLM Wiki skill
+│       ├── SKILL.md       # Four subcommands: ingest/query/lint/publish
+│       └── references/    # Shared spec documents (7 *-spec.md files)
+├── raw/               # Raw materials (human-curated, LLM read-only)
+│   ├── articles/      # Web articles, blog posts
+│   ├── papers/        # Academic papers, white papers
+│   ├── docs/          # Official documentation excerpts
+│   ├── transcripts/   # Meeting notes, talks, podcast notes
+│   └── assets/        # Images, diagrams, data files
+├── wiki/              # LLM compiled artifacts (LLM read-write, human read-only)
+│   ├── index.md       # Global index
+│   ├── log.md         # Operation log
+│   ├── log-archive/   # Log archive (by month)
+│   ├── lifecycle.md   # [Pluggable] Detailed lifecycle data
+│   ├── entities/      # Entity pages (tools, frameworks, people)
+│   ├── concepts/      # Concept pages (patterns, methodologies)
+│   ├── summaries/     # Material summary pages
+│   ├── comparisons/   # Comparative analysis pages
+│   └── synthesis/     # Synthesis analysis pages
+└── output/            # Polished output (LLM generates, human reviews and finalizes)
+    ├── posts/         # Blog posts, articles
+    ├── reports/       # Research reports, technical survey reports
+    ├── slides/        # Presentations (Marp format)
+    ├── tutorials/     # Tutorials, step-by-step guides
+    └── newsletters/   # Weekly, monthly, knowledge briefings
 ```
 
-## 工作流
+## Core Principles
 
-| 操作 | 触发方式 | 说明 |
+### Compilation over Retrieval
+
+Traditional RAG retrieves from raw documents and assembles answers from scratch on every query — knowledge never accumulates. LLM Wiki takes the opposite approach: each time material is ingested, the LLM **compiles** knowledge into structured wiki pages, and subsequent queries are answered based on pre-compiled knowledge. Knowledge is compiled, linked, and continuously optimized — just like code.
+
+### Knowledge Lifecycle Management
+
+Knowledge doesn't stay valid forever once written. This project introduces a complete lifecycle management mechanism:
+
+- **Confidence Scoring**: Each page carries a confidence score (0.0–1.0), dynamically adjusted based on source count, access frequency, and time decay. Knowledge cross-confirmed by multiple sources is more trustworthy than single-source knowledge.
+- **Forgetting Curve**: Inspired by the Ebbinghaus forgetting curve, knowledge that hasn't been accessed or reinforced over time naturally decays in confidence. Different types decay at different rates — conceptual knowledge decays slowly, comparative analysis decays quickly.
+- **State Transitions**: active → stale → archived. Being queried or confirmed by new sources can restore active status.
+- **Supersession**: When new information explicitly refutes old conclusions, superseded_by/supersedes bidirectional links enable version chain traceability. Old versions are preserved but marked as outdated.
+- **Demotion**: When high-level synthesis is disproven, it is demoted to stale pending re-verification. Lower-level entities and concepts are unaffected.
+
+### Layered Consolidation (Four-Tier Memory Model)
+
+Knowledge progressively promotes from lower to higher tiers. Each tier is more compressed, more reliable, and has a longer lifecycle:
+
+```
+┌─────────────────────────────────────────────────┐
+│  Procedural    output/*                          │  Ready-to-use deliverables
+├─────────────────────────────────────────────────┤
+│  Semantic      wiki/comparisons/ + synthesis/    │  Cross-material insights
+├─────────────────────────────────────────────────┤
+│  Episodic      wiki/entities/ + concepts/        │  Structured knowledge
+├─────────────────────────────────────────────────┤
+│  Working       wiki/summaries/                   │  Single-material summaries
+└─────────────────────────────────────────────────┘
+```
+
+Promotion criteria: An entity/concept in a summary is mentioned by 2+ materials → create entity/concept; 3+ entities/concepts form a pattern → create comparison/synthesis; synthesis confidence ≥ 0.85 → suggest publishing as a deliverable.
+
+### Progressive Disclosure
+
+Detailed rules are distilled into [Agent Skills](https://agentskills.io/) (`skills/llm-wiki/`). AGENTS.md only retains a quick overview of core concepts. When executing specific operations, the LLM loads skill instructions and references on demand, avoiding heavy context consumption on every conversation.
+
+## Core Capabilities
+
+| Capability | Description |
+|------|------|
+| **Ingest** | Read materials from raw/, extract entities and concepts, create/update wiki pages, automatically maintain cross-references |
+| **Query** | Answer based on compiled wiki knowledge, prioritize high-confidence pages, archive valuable answers |
+| **Lint** | Contradiction detection, orphan pages, missing references, cross-reference integrity, lifecycle decay and state transitions |
+| **Publish** | Produce blog posts, reports, slides, tutorials, briefings, and other standalone deliverables from wiki |
+| **Lifecycle Management** | Confidence scoring, forgetting curve decay, state transitions, supersession/demotion, layered consolidation promotion |
+| **Pluggable Extension** | Lifecycle is an enhancement layer — deleting lifecycle.md does not affect core wiki functionality |
+
+## Workflow
+
+All operations are executed through the `llm-wiki` skill (see `skills/llm-wiki/SKILL.md` for details):
+
+| Operation | Usage | Description |
 |---|---|---|
-| Ingest | 新素材放入 `raw/`，告诉 LLM 处理 | LLM 读取素材 → 提取要点 → 创建/更新 Wiki 页面 → 维护交叉引用 |
-| Query | 向 LLM 提问 | LLM 基于 Wiki 已编译知识回答，有价值的回答可存回 Wiki |
-| Lint | 定期要求 LLM 检查 | 检查矛盾、孤立页面、缺失引用、过时内容，保持 Wiki 健康 |
-| Publish | 要求 LLM 从`wiki`提炼成品输出 | LLM 生成，人类审核定稿 |
+| Ingest | `/llm-wiki ingest <raw/path/file>` | Read material → extract key points → create/update wiki pages → maintain cross-references → update lifecycle |
+| Query | `/llm-wiki query <question>` | Answer based on compiled wiki knowledge, prioritize high-confidence pages, optionally save valuable answers back to wiki |
+| Lint | `/llm-wiki lint` | Check for contradictions, orphan pages, missing references, lifecycle decay and state transitions — keep wiki healthy |
+| Publish | `/llm-wiki publish <type> [topic]` | Produce polished output from wiki; LLM generates draft, human reviews and finalizes |
 
-## 核心原则
+## Core Principles
 
-- **Schema 层**（`AGENTS.md` / `CLAUDE.md` / `GEMINI.md`）：告诉 LLM 如何维护 wiki
-- **Raw 层**（`raw/`）：不可变的原始素材，是事实来源
-- **Wiki 层**（`wiki/`）：LLM 的编译产物，所有知识的结构化呈现
-- **Output 层**（`output/`）：从 wiki 提炼的成品，面向外部受众，独立可读
-- 知识复利：每次操作都让 Wiki 更丰富
-- 详细规范见 [AGENTS.md](AGENTS.md)
+- **Schema Layer** (`AGENTS.md`): Tells the LLM how to maintain the wiki — quick overview of core concepts
+- **Skills Layer** (`skills/llm-wiki/`): Detailed workflow rules, loaded on demand, progressive disclosure
+- **Raw Layer** (`raw/`): Immutable raw materials — the source of truth
+- **Wiki Layer** (`wiki/`): LLM's compiled artifacts — structured representation of all knowledge
+- **Output Layer** (`output/`): Deliverables distilled from wiki — standalone, audience-facing, independently readable
+- Knowledge compound interest: Every operation makes the wiki richer
+- Lifecycle management: Knowledge has temperature — frequently used knowledge warms up, long-dormant knowledge cools down
+- Detailed specs in [AGENTS.md](AGENTS.md), full workflow in [skills/llm-wiki/SKILL.md](skills/llm-wiki/SKILL.md)
 
-## 快速开始
+## Quick Start
 
-### 1. 选择你的 LLM Agent
+### 1. Choose Your LLM Agent
 
-本项目提供三份等价的 Schema 文件，选择你使用的工具对应的即可：
+This project provides three equivalent schema files — pick the one matching your tool:
 
-| 工具 | Schema 文件 | 说明 |
+| Tool | Schema File | Description |
 |------|-----------|------|
-| OpenAI Codex / 通用 | `AGENTS.md` | 通用规范 |
-| Claude Code | `CLAUDE.md` | 适配 Claude 的工具调用方式 |
-| Gemini CLI | `GEMINI.md` | 适配 Gemini 的工具和上下文窗口 |
-| Kiro | `AGENTS.md` | Kiro 自动读取 AGENTS.md |
+| OpenAI Codex / General | `AGENTS.md` | General spec |
+| Claude Code | `CLAUDE.md` | Adapted for Claude's tool invocation patterns |
+| Gemini CLI | `GEMINI.md` | Adapted for Gemini's tools and context window |
+| Kiro | `AGENTS.md` | Kiro automatically reads AGENTS.md |
 
-### 2. 添加素材
+### 2. Add Materials
 
-将你要消化的素材放入 `raw/` 对应子目录：
+Place materials you want to digest into the appropriate `raw/` subdirectory:
 
 ```bash
-# 网络文章（推荐用 Obsidian Web Clipper 保存为 Markdown）
+# Web articles (recommended: save as Markdown using Obsidian Web Clipper)
 raw/articles/2026-04-13-some-article.md
 
-# 学术论文
+# Academic papers
 raw/papers/2026-04-13-some-paper.pdf
 
-# 会议记录、读书笔记
+# Meeting notes, reading notes
 raw/transcripts/2026-04-13-meeting-notes.md
 ```
 
-建议在文件开头注明来源 URL、作者、日期。
+It's recommended to note the source URL, author, and date at the beginning of each file.
 
-### 3. 让 LLM 消化
+### 3. Let the LLM Digest
 
-告诉你的 LLM Agent：
-
-```
-消化 raw/articles/2026-04-13-some-article.md
-```
-
-LLM 会：
-1. 阅读素材，与你讨论关键要点
-2. 创建素材摘要页（`wiki/summaries/`）
-3. 创建或更新相关实体页和概念页
-4. 维护所有交叉引用
-5. 更新全局索引和操作日志
-
-### 4. 提问
-
-直接向 LLM 提问，它会基于 wiki 中已编译的知识回答：
+Tell your LLM Agent:
 
 ```
-对比 Playwright 和 Cypress 的优劣
+Digest raw/articles/2026-04-13-some-article.md
 ```
 
-有价值的回答可以归档为 wiki 页面（对比分析或综合分析）。
+The LLM will:
+1. Read the material and discuss key points with you
+2. Create a material summary page (`wiki/summaries/`)
+3. Create or update related entity and concept pages
+4. Maintain all cross-references
+5. Update the global index and operation log
 
-### 5. 发布成品
+### 4. Ask Questions
 
-从 wiki 中提炼面向外部的成品输出：
-
-```
-把 wiki 中关于 Playwright vs Cypress 的知识整理成一篇博客
-```
-
-LLM 会从 wiki 提炼内容、转换为独立可读的标准 Markdown、存入 `output/posts/`，你审核定稿。
-
-支持的输出类型：博客文章、研究报告、Marp 幻灯片、教程、知识简报。
-
-### 6. 巡检
-
-定期让 LLM 检查 wiki 健康状况：
+Ask the LLM directly — it will answer based on compiled knowledge in the wiki:
 
 ```
-巡检一下 wiki
+Compare the pros and cons of Playwright vs Cypress
 ```
 
-LLM 会检查矛盾、孤立页面、缺失概念页、过时信息等。
+Valuable answers can be archived as wiki pages (comparisons or synthesis).
 
-## Obsidian 配置指南
+### 5. Publish Deliverables
 
-本项目的 wiki 层完全兼容 [Obsidian](https://obsidian.md/)，推荐用 Obsidian 作为浏览器。LLM 在一侧编辑，你在 Obsidian 中实时浏览。
+Produce audience-facing deliverables from wiki content:
 
-### 基础配置
+```
+Turn the wiki knowledge about Playwright vs Cypress into a blog post
+```
 
-1. 用 Obsidian 打开本项目根目录作为 Vault
+The LLM will distill content from the wiki, convert it to standalone standard Markdown, and save it to `output/posts/`. You review and finalize.
 
-2. 进入 **Settings → Files and links**，做以下调整：
+Supported output types: blog posts, research reports, Marp slides, tutorials, knowledge briefings.
 
-   | 设置项 | 推荐值 | 说明 |
+### 6. Health Check
+
+Periodically have the LLM check wiki health:
+
+```
+Run a health check on the wiki
+```
+
+The LLM will check for contradictions, orphan pages, missing concept pages, outdated information, and more.
+
+## Obsidian Configuration Guide
+
+This project's wiki layer is fully compatible with [Obsidian](https://obsidian.md/). Obsidian is recommended as the browser. The LLM edits on one side while you browse in real-time in Obsidian.
+
+### Basic Configuration
+
+1. Open this project's root directory as a Vault in Obsidian
+
+2. Go to **Settings → Files and links** and adjust the following:
+
+   | Setting | Recommended Value | Description |
    |--------|--------|------|
-   | Default location for new notes | `raw/articles` | 新笔记默认存入 raw 目录 |
-   | New link format | Shortest path when possible | 链接格式简洁 |
-   | Use `[[Wikilinks]]` | 开启 | 启用双链语法 |
-   | Attachment folder path | `raw/assets/` | 附件统一存放 |
-   | Detect all file extensions | 开启 | 识别 PDF 等非 md 文件 |
+   | Default location for new notes | `raw/articles` | New notes default to the raw directory |
+   | New link format | Shortest path when possible | Concise link format |
+   | Use `[[Wikilinks]]` | Enabled | Enable wikilink syntax |
+   | Attachment folder path | `raw/assets/` | Centralized attachment storage |
+   | Detect all file extensions | Enabled | Recognize non-md files like PDFs |
 
-3. 进入 **Settings → Editor**：
+3. Go to **Settings → Editor**:
 
-   | 设置项 | 推荐值 | 说明 |
+   | Setting | Recommended Value | Description |
    |--------|--------|------|
-   | Show frontmatter | 开启 | 显示 YAML 元数据 |
-   | Readable line length | 开启 | 提升阅读体验 |
+   | Show frontmatter | Enabled | Display YAML metadata |
+   | Readable line length | Enabled | Improve reading experience |
 
-### 推荐插件
+### Recommended Plugins
 
-#### Obsidian 社区插件
+#### Obsidian Community Plugins
 
-在 **Settings → Community plugins** 中搜索安装：
+Search and install in **Settings → Community plugins**:
 
-| 插件 | 用途 | 配置要点 |
+| Plugin | Purpose | Configuration Notes |
 |------|------|---------|
-| **Dataview** | 动态查询页面元数据 | 用 `dataview` 代码块查询 frontmatter 中的 tags、sources 等字段，生成动态表格 |
-| **Excalidraw** | 手绘风格白板与图表 | 可在 wiki 页面中嵌入架构图、流程图、概念关系图。文件存入 `raw/assets/`，通过 `![[文件名.excalidraw]]` 嵌入 |
-| **Local Images Plus** | 自动下载远程图片到本地 | 设置下载路径为 `raw/assets/`。粘贴或导入含远程图片的文章时，自动将图片下载到本地并替换链接，防止外链失效 |
+| **Dataview** | Dynamic querying of page metadata | Use `dataview` code blocks to query frontmatter fields like tags, sources, etc., generating dynamic tables |
+| **Excalidraw** | Hand-drawn style whiteboard and diagrams | Embed architecture diagrams, flowcharts, concept relationship maps in wiki pages. Store files in `raw/assets/`, embed via `![[filename.excalidraw]]` |
+| **Local Images Plus** | Auto-download remote images to local | Set download path to `raw/assets/`. When pasting or importing articles with remote images, automatically downloads images locally and replaces links, preventing broken external links |
 
-#### 浏览器扩展
+#### Browser Extensions
 
-| 扩展 | 浏览器 | 用途 | 配置要点 |
+| Extension | Browser | Purpose | Configuration Notes |
 |------|--------|------|---------|
-| **Obsidian Web Clipper** | Chrome / Firefox / Safari | 一键将网页文章保存为 Markdown | 安装后设置保存路径为 `raw/articles/`，配合 Local Images Plus 自动下载文章中的图片 |
+| **Obsidian Web Clipper** | Chrome / Firefox / Safari | One-click save web articles as Markdown | After installation, set save path to `raw/articles/`. Works with Local Images Plus to auto-download images from articles |
 
-### 图谱视图配置
+### Graph View Configuration
 
-Obsidian 的图谱视图（Graph View）是浏览知识结构的最佳方式：
+Obsidian's Graph View is the best way to browse knowledge structure:
 
-1. 打开图谱视图（`Ctrl/Cmd + G`）
-2. 推荐过滤设置：
-   - **Filters → Search files**：输入 `path:wiki/` 只显示 wiki 页面
-   - **Groups**：按目录着色区分实体、概念、摘要等类型
-     - `path:wiki/entities` → 蓝色
-     - `path:wiki/concepts` → 绿色
-     - `path:wiki/summaries` → 黄色
-     - `path:wiki/comparisons` → 橙色
-     - `path:wiki/synthesis` → 紫色
-3. 观察：
-   - 连接最多的节点是知识枢纽
-   - 孤立节点可能需要补充交叉引用
-   - 聚类揭示知识领域的自然分组
+1. Open Graph View (`Ctrl/Cmd + G`)
+2. Recommended filter settings:
+   - **Filters → Search files**: Enter `path:wiki/` to show only wiki pages
+   - **Groups**: Color-code by directory to distinguish entities, concepts, summaries, etc.
+     - `path:wiki/entities` → Blue
+     - `path:wiki/concepts` → Green
+     - `path:wiki/summaries` → Yellow
+     - `path:wiki/comparisons` → Orange
+     - `path:wiki/synthesis` → Purple
+3. Observe:
+   - Nodes with the most connections are knowledge hubs
+   - Isolated nodes may need additional cross-references
+   - Clusters reveal natural groupings of knowledge domains
 
-### Dataview 查询示例
+### Dataview Query Examples
 
-安装 Dataview 插件后，可以在任意 Markdown 文件中使用以下查询：
+After installing the Dataview plugin, you can use the following queries in any Markdown file:
 
-**按标签列出所有页面**：
+**List all pages by tag**:
 
 ````markdown
 ```dataview
 TABLE tags, description, updated
 FROM "wiki"
-WHERE contains(tags, "测试")
+WHERE contains(tags, "testing")
 SORT updated DESC
 ```
 ````
 
-**列出最近更新的页面**：
+**List recently updated pages**:
 
 ````markdown
 ```dataview
@@ -226,7 +285,7 @@ LIMIT 10
 ```
 ````
 
-**列出所有素材摘要及其来源**：
+**List all material summaries with their sources**:
 
 ````markdown
 ```dataview
@@ -236,15 +295,15 @@ SORT created DESC
 ```
 ````
 
-### 下载图片到本地
+### Downloading Images Locally
 
-为防止外部图片链接失效，建议将文章中的图片下载到本地：
+To prevent external image links from breaking, it's recommended to download article images locally:
 
-- **推荐方式**：安装 **Local Images Plus** 插件（见上方推荐插件），它会在你粘贴或导入文章时自动下载远程图片到 `raw/assets/` 并替换链接，全自动。
-- **手动方式**：**Settings → Hotkeys** 搜索 "Download"，为 "Download attachments for current file" 绑定快捷键（如 `Ctrl+Shift+D`）。用 Web Clipper 保存文章后按快捷键即可。
+- **Recommended**: Install the **Local Images Plus** plugin (see recommended plugins above). It automatically downloads remote images to `raw/assets/` and replaces links when you paste or import articles — fully automatic.
+- **Manual**: Go to **Settings → Hotkeys**, search for "Download", and bind a shortcut (e.g., `Ctrl+Shift+D`) for "Download attachments for current file". After saving an article with Web Clipper, press the shortcut.
 
-## 许可
+## License
 
-> 本项目结构和 Schema 设计基于 [Karpathy 的 LLM Wiki 理念](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
+> This project's structure and schema design is based on [Karpathy's LLM Wiki concept](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
 
-MIT License — 详见 [LICENSE](LICENSE)。
+MIT License — see [LICENSE](LICENSE).
