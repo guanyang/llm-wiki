@@ -106,22 +106,25 @@ Retrieve knowledge from wiki and synthesize answers to user questions.
 
 Check wiki health and fix issues.
 
-1. **Structural checks**:
+1. **Run structural check script**: `python3 skills/llm-wiki/scripts/lint-check.py`, outputs a JSON report containing:
+   - Page count verification (actual vs declared)
+   - Orphan page list (no incoming links)
+   - Missing page list (referenced but not created)
+   - Missing frontmatter fields
+   - One-way link list (A→B but B↛A)
+2. **Run lifecycle check script** (if lifecycle.md exists): `python3 skills/llm-wiki/scripts/lifecycle-check.py`, outputs a JSON report containing:
+   - Time decay suggestions (base decay × type coefficient = actual decay, with current/suggested confidence)
+   - State transition suggestions (which pages should move from active → stale or stale → archived)
+   - Outdated deliverable check (which output deliverables have stale/archived dependencies)
+3. **LLM semantic check** (based on script reports + page content):
    - Contradiction detection: Contradictory claims between pages
-   - Orphan pages: Pages with no incoming links (index.md links don't count)
-   - Missing pages: Referenced by multiple `[[wikilinks]]` but not yet created
-   - Cross-references: Bidirectional links between related pages
-   - Frontmatter: Required field completeness (title/tags/category/created/updated/sources/description)
-2. **Lifecycle checks** (if lifecycle.md exists):
-   - Time decay: Calculate confidence decay based on days since last_accessed (rules in `lifecycle-spec`), update index.md and lifecycle.md
-   - State transitions: active → stale (90 days unaccessed and confidence < 0.5) → archived (180 days with no new sources)
-   - Demotion: synthesis/comparison core conclusion disproven → set status to stale, confidence −0.15, add warning to body
+   - Demotion assessment: Whether synthesis/comparison core conclusions have been disproven by new material → set status to stale, confidence −0.15, add warning to body
    - Promotion suggestions: Pages meeting promotion criteria but not yet promoted
    - Outdated deliverables: Dependent pages are stale/archived → mark deliverable as outdated
    - Lint pass reward: Pages with no contradictions get confidence +0.02
-3. **Log archival**: Records older than 30 days → `wiki/log-archive/YYYY-MM.md`
-4. **Generate fix list**: Output issue list, execute fixes after user confirmation
-5. **Record log**
+4. **Log archival**: `python3 skills/llm-wiki/scripts/log-archive.py` (run with `--dry-run` first to preview, then remove the flag to execute)
+5. **Generate fix list**: Consolidate script reports + semantic check results, execute fixes after user confirmation
+6. **Record log**
 
 ### Verification
 
