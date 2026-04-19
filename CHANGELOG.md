@@ -1,5 +1,18 @@
 # Changelog
 
+## [2026-04-19] — v4.2: Visual Compilation Engines
+
+### Overview
+
+Expanded the wiki ecosystem with native visual compilation capabilities. Introduced three specialized diagramming engines (Canvas, Excalidraw, Mermaid) to generate highly precise architecture diagrams and mind maps, treating visual thinking as a first-class citizen alongside text.
+
+### New Features
+
+- **`visual-canvas` skill** — Built-in Obsidian Canvas visualization engine with native layout algorithms for spatially organizing concepts and mind maps.
+- **`visual-excalidraw` skill** — Specialized Excalidraw architecture diagram engine featuring strict JSON crash-prevention rules for reliable drawing.
+- **`visual-mermaid` skill** — Dedicated Mermaid graph generation workflow with guidelines to avoid common Markdown rendering conflicts.
+- **Visual Mind Library** — Added `raw/visual/` directory to store and manage the raw source files for these three visual engines.
+
 ## [2026-04-19] — v4.1: Web Re-verification, Refresh Subcommand & Skill Optimization
 
 ### Overview

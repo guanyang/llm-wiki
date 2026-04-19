@@ -22,15 +22,17 @@
 ├── AGENTS.md          # Schema 规范（OpenAI Codex 等通用 Agent）
 ├── CLAUDE.md          # Schema 规范（Claude Code 适配）
 ├── GEMINI.md          # Schema 规范（Gemini CLI 适配）
-├── skills/                # Agent Skill（工作流详细规则，按需加载）
-│   └── llm-wiki/          # LLM Wiki skill
-│       ├── SKILL.md       # 五个子命令：ingest/query/lint/publish/refresh
-│       └── references/    # 共享规范文档（7 个 *-spec.md）
+├── skills/                # Agent Skill（工作流详细规范，严格遵守渐进式披露）
+│   ├── llm-wiki/          # 核心知识操作引擎（包含 ingest/query/lint 等子命令）
+│   ├── visual-canvas/     # Obsidian Canvas 可视化引擎与原生布局算法
+│   ├── visual-excalidraw/ # Excalidraw 架构图引擎与 JSON 防崩规约
+│   └── visual-mermaid/    # Mermaid 图表生成流与Markdown冲突避坑指南
 ├── raw/               # 原始素材（人类策展，LLM 只读）
 │   ├── articles/      # 网络文章、博客
 │   ├── papers/        # 学术论文、白皮书
 │   ├── docs/          # 官方文档摘录
 │   ├── transcripts/   # 会议记录、演讲稿、播客笔记
+│   ├── visual/        # 视觉思维库，存放 Canvas、Excalidraw 与 Mermaid 绘图源文件
 │   └── assets/        # 图片、图表、数据文件
 ├── wiki/              # LLM 编译产物（LLM 读写，人类只读）
 │   ├── index.md       # 全局索引
@@ -102,6 +104,7 @@
 | **健康检查（Lint）** | 矛盾检测、孤立页面、缺失引用、交叉引用完整性、生命周期衰减和状态流转 |
 | **成品发布（Publish）** | 从 wiki 提炼博客、报告、幻灯片、教程、简报等独立可读的成品 |
 | **联网重验证（Refresh）** | 联网检索特定主题的最新信息，与 wiki 现有内容对比，用户确认后固化更新 |
+| **可视化编译（Visual）** | 内置三套绘图引擎（Canvas/Excalidraw/Mermaid），确保输出极致精准的架构图与思维导图 |
 | **生命周期管理** | 置信度评分、遗忘曲线衰减、状态流转、取代/降级机制、分层固化晋升 |
 | **可插拔扩展** | 生命周期是增强层，删除 lifecycle.md 后 wiki 核心功能不受影响 |
 

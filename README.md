@@ -22,15 +22,17 @@ Core idea: Knowledge is not derived from scratch on every query — it is **comp
 ├── AGENTS.md          # Schema spec (OpenAI Codex and other general agents)
 ├── CLAUDE.md          # Schema spec (Claude Code adaptation)
 ├── GEMINI.md          # Schema spec (Gemini CLI adaptation)
-├── skills/                # Agent Skills (detailed workflow rules, loaded on demand)
-│   └── llm-wiki/          # LLM Wiki skill
-│       ├── SKILL.md       # Five subcommands: ingest/query/lint/publish/refresh
-│       └── references/    # Shared spec documents (7 *-spec.md files)
+├── skills/                # Agent Skills (detailed workflow specs, strictly following progressive disclosure)
+│   ├── llm-wiki/          # Core knowledge operations engine (includes ingest/query/lint subcommands)
+│   ├── visual-canvas/     # Obsidian Canvas visual engine with native layout algorithms
+│   ├── visual-excalidraw/ # Excalidraw architecture diagram engine with JSON crash-prevention rules
+│   └── visual-mermaid/    # Mermaid diagram generation flow and Markdown conflict avoidance guide
 ├── raw/               # Raw materials (human-curated, LLM read-only)
 │   ├── articles/      # Web articles, blog posts
 │   ├── papers/        # Academic papers, white papers
 │   ├── docs/          # Official documentation excerpts
 │   ├── transcripts/   # Meeting notes, talks, podcast notes
+│   ├── visual/        # Visual thinking library, storing Canvas, Excalidraw, and Mermaid source files
 │   └── assets/        # Images, diagrams, data files
 ├── wiki/              # LLM compiled artifacts (LLM read-write, human read-only)
 │   ├── index.md       # Global index
@@ -102,6 +104,7 @@ Detailed rules are distilled into [Agent Skills](https://agentskills.io/) (`skil
 | **Lint** | Contradiction detection, orphan pages, missing references, cross-reference integrity, lifecycle decay and state transitions |
 | **Publish** | Produce blog posts, reports, slides, tutorials, briefings, and other standalone deliverables from wiki |
 | **Refresh** | Re-verify a specific topic via web search, compare with existing wiki content, persist updates after user confirmation |
+| **Visual** | Built-in three diagram engines (Canvas/Excalidraw/Mermaid), ensuring output of extremely precise architecture diagrams and mind maps |
 | **Lifecycle Management** | Confidence scoring, forgetting curve decay, state transitions, supersession/demotion, layered consolidation promotion |
 | **Pluggable Extension** | Lifecycle is an enhancement layer — deleting lifecycle.md does not affect core wiki functionality |
 

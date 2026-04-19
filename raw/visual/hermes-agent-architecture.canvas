@@ -1,0 +1,26 @@
+{
+	"nodes":[
+		{"id":"c3d4e5f67890a1b2","type":"group","x":150,"y":200,"width":700,"height":350,"color":"6","label":"Hermes Core Intelligence"},
+		{"id":"e1f2a3b4c5d6e7f8","type":"group","x":-50,"y":-50,"width":1100,"height":200,"color":"5","label":"User Interface & Platforms"},
+		{"id":"56789abcdef01234","type":"group","x":550,"y":600,"width":500,"height":250,"color":"3","label":"Execution & Providers"},
+		{"id":"3456789abcdef012","type":"group","x":-50,"y":600,"width":450,"height":250,"color":"2","label":"Integration Layer (v0.10.0)"},
+		{"id":"f67890a1b2c3d4e5","type":"group","x":900,"y":200,"width":300,"height":350,"color":"4","label":"Three-Tier Memory"},
+		{"id":"a1b2c3d4e5f67890","type":"text","text":"### Messaging Gateway\niMessage, WeChat, WhatsApp, Signal, Telegram, Discord, Slack","x":50,"y":20,"width":400,"height":100,"color":"5"},
+		{"id":"b2c3d4e5f67890a1","type":"text","text":"### CLI / TUI\nFull TUI with streaming tool output and autocomplete","x":550,"y":20,"width":400,"height":100,"color":"5"},
+		{"id":"d4e5f67890a1b2c3","type":"text","text":"### Self-Improving Loop\n- Skill Extraction\n- Autonomous Refinement\n- Performance Evaluation","x":200,"y":270,"width":250,"height":150,"color":"1"},
+		{"id":"e5f67890a1b2c3d4","type":"text","text":"### Honcho Dialectic\nUser Modeling framework to build deepening profiles across sessions","x":550,"y":270,"width":250,"height":150,"color":"6"},
+		{"id":"0123456789abcdef","type":"text","text":"**Short-term**\nActive Conversation Context","x":925,"y":250,"width":250,"height":80,"color":"4"},
+		{"id":"123456789abcdef0","type":"text","text":"**Episodic**\nPast History & FTS5 Search","x":925,"y":350,"width":250,"height":80,"color":"4"},
+		{"id":"23456789abcdef01","type":"text","text":"**Procedural**\nSelf-Improving Skills Hub","x":925,"y":450,"width":250,"height":80,"color":"4"},
+		{"id":"456789abcdef0123","type":"text","text":"### Tool Gateway\n- Unified Search & Browser Auto\n- Native Image Gen / TTS\n- Integrated Camofox Support","x":0,"y":670,"width":350,"height":160,"color":"2"},
+		{"id":"6789abcdef012345","type":"text","text":"### Provider Abstraction\nOpenRouter, Google AI Studio, NIM, Local, etc.","x":600,"y":650,"width":400,"height":80,"color":"3"},
+		{"id":"789abcdef0123456","type":"text","text":"### Infrastructure Backends\nModal, Daytona, Singularity, Docker, SSH","x":600,"y":750,"width":400,"height":80,"color":"3"}
+	],
+	"edges":[
+		{"id":"edge_platform_to_core","fromNode":"e1f2a3b4c5d6e7f8","fromSide":"bottom","toNode":"c3d4e5f67890a1b2","toSide":"top"},
+		{"id":"edge_core_to_memory","fromNode":"c3d4e5f67890a1b2","fromSide":"right","toNode":"f67890a1b2c3d4e5","toSide":"left"},
+		{"id":"edge_core_to_gateway","fromNode":"d4e5f67890a1b2c3","fromSide":"bottom","toNode":"3456789abcdef012","toSide":"top","label":"Triggers Tools"},
+		{"id":"edge_core_to_providers","fromNode":"d4e5f67890a1b2c3","fromSide":"bottom","toNode":"56789abcdef01234","toSide":"top","label":"Calls Models"},
+		{"id":"edge_gateway_to_infra","fromNode":"3456789abcdef012","fromSide":"right","toNode":"56789abcdef01234","toSide":"left"}
+	]
+}
