@@ -167,5 +167,5 @@ Re-verify a specific topic via web search and update wiki if needed.
 2. **Web search**: Search for latest developments, version updates, and disruptive changes on the topic
 3. **Diff assessment**: Compare latest information with existing wiki content, identify significant additions or conflicts
 4. **Request confirmation**: Report findings to user, ask whether to persist as new raw material
-5. **Execute update** (after user confirmation): Save as `raw/00-Inbox/web-sync-[topic]-[date].md`, invoke ingest to update wiki
+5. **Execute update** (after user confirmation): Save as `raw/articles/[date]-[topic].md`, invoke ingest to update wiki
 6. **Record log**
