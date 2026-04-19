@@ -117,7 +117,7 @@
 | Publish | `/llm-wiki publish <类型> [主题]` | 从 Wiki 提炼成品输出，LLM 生成草稿，人类审核定稿 |
 | Refresh | `/llm-wiki refresh <主题>` | 联网重验证特定主题，与 wiki 对比差异，用户确认后固化新信息到 raw/ |
 
-## 核心原则
+## 总体原则
 
 - **Schema 层**（`AGENTS.md`）：告诉 LLM 如何维护 wiki，核心概念速览
 - **Skills 层**（`skills/llm-wiki/`）：工作流详细规则，按需加载，渐进式披露

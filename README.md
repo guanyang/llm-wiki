@@ -117,7 +117,7 @@ All operations are executed through the `llm-wiki` skill (see `skills/llm-wiki/S
 | Publish | `/llm-wiki publish <type> [topic]` | Produce polished output from wiki; LLM generates draft, human reviews and finalizes |
 | Refresh | `/llm-wiki refresh <topic>` | Re-verify a specific topic via web search; persist new information to raw/ after user confirmation |
 
-## Core Principles
+## General Principles
 
 - **Schema Layer** (`AGENTS.md`): Tells the LLM how to maintain the wiki — quick overview of core concepts
 - **Skills Layer** (`skills/llm-wiki/`): Detailed workflow rules, loaded on demand, progressive disclosure
