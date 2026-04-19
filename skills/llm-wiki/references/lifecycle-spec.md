@@ -7,7 +7,7 @@
 | File | Fields Carried | Read Frequency |
 |------|---------|---------|
 | `wiki/index.md` | confidence, status | High |
-| `wiki/lifecycle.md` | access, last_accessed, superseded_by, supersedes, Output tracking | Low |
+| `wiki/lifecycle.md` | access, last_accessed, superseded_by, supersedes | Low |
 
 ## Confidence
 
@@ -24,10 +24,13 @@
 
 | Event | Change |
 |------|------|
+| Web re-verification found no conflict | +0.20 |
 | Referenced by publish | +0.15 |
 | Confirmed by new source (ingest) | +0.10 |
 | Hit by query | +0.05 |
 | Lint pass with no contradictions | +0.02 |
+
+> If a new source includes a major update from web verification that conflicts with and supersedes old knowledge, it is treated as a new ingest and processed with the corresponding confidence rules. Any effective refresh or web-based verification counts as an activation event, resetting the time decay timer.
 
 ### Event Decay (floor at 0.0)
 
@@ -101,7 +104,3 @@ Working       wiki/summaries/
 
 Confidence inheritance: new page = weighted average of dependent pages (floor at 0.65). Promotion does not delete the source.
 
-## Output Deliverable Tracking
-
-lifecycle.md Output section: status (current/outdated), wiki_deps, created.
-During lint: if dependent pages are stale/archived → mark deliverable as outdated.

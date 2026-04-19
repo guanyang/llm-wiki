@@ -1,5 +1,35 @@
 # Changelog
 
+## [2026-04-19] — v4.1: Web Re-verification, Refresh Subcommand & Skill Optimization
+
+### Overview
+
+Major upgrade to the `llm-wiki` skill (v3.1 → v4.1). Introduces the `refresh` subcommand for web-based knowledge re-verification, enhances `query` with proactive freshness checks, strengthens `lint` with semantic evaluation, and removes output deliverable lifecycle tracking to reduce complexity.
+
+### New Features
+
+- **`refresh` subcommand** — Re-verify a specific topic via web search, compare with existing wiki content, persist updates to `raw/` after user confirmation, then trigger ingest
+- **`query` freshness check** — Pages with confidence < 0.6 or stale status now trigger proactive web search for latest information
+- **`lint` semantic enhancements** — One-way link semantic relevance assessment; staleness probing suggests `refresh` for high-frequency topics in stale pages
+- **`publish` verification checklist** — Added 3-item verification checklist (no wikilinks, complete frontmatter, proper citations)
+- **Web re-verification reinforcement** — New +0.20 confidence boost when web re-verification finds no conflict; any refresh/web verification resets time decay timer
+
+### Removed
+
+- **Output deliverable lifecycle tracking** — Removed `## Output Deliverable Tracking` section from `lifecycle-spec.md`, removed `calc_output_staleness()` from `lifecycle-check.py`, removed output-related references from `SKILL.md`. Layered consolidation (including Procedural layer) is preserved.
+
+### Modified
+
+- **skills/llm-wiki/SKILL.md** (v3.1 → v4.1) — Added `refresh` subcommand workflow; enhanced `query` step 3-4 with freshness check and incremental save; enhanced `lint` step 3 with one-way link evaluation and staleness probing; added `publish` verification checklist; added gotcha about refresh requiring user confirmation; updated description with natural language trigger phrases
+- **skills/llm-wiki/references/lifecycle-spec.md** — Added +0.20 reinforcement event for web re-verification; added clarification paragraph about refresh resetting time decay; removed `Output tracking` from data distribution table; removed `## Output Deliverable Tracking` section
+- **skills/llm-wiki/references/log-spec.md** — Enriched `lint` log format (check results + fix actions sections); added source field to `publish` log; added `refresh` log entry type
+- **skills/llm-wiki/references/output-page-spec.md** — Aligned frontmatter with wiki-page-spec pattern (`aliases`, `tags`, `sources`, `description` instead of `type`, `audience`, `status`, `wiki_sources`); added body structure rules (h2/h3 hierarchy, code block language annotation)
+- **skills/llm-wiki/scripts/lifecycle-check.py** — Removed `calc_output_staleness()` function and Output section parsing; simplified `parse_lifecycle()` return value
+- **AGENTS.md** — Fixed lifecycle reference path (`lifecycle.md` → `lifecycle-spec.md`); updated subcommand count to five; added `refresh` subcommand; added core principle #9 (Web Re-verification)
+- **CLAUDE.md** — Updated subcommand count to five; added `refresh` subcommand; added core principle #9
+- **GEMINI.md** — Added core principle #9 (Web Re-verification)
+- **README.md** — Updated subcommand count to five; added Refresh capability and workflow rows; updated Query descriptions with freshness check; added "Web Re-verification & Fact Preservation" section; added "7. Re-verify Topics" Quick Start section
+
 ## [2026-04-15] — i18n: Full English Translation + Architecture Upgrade to Skill-based System
 
 ### Overview

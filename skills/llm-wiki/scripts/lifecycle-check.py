@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lifecycle check — time decay + state transitions + output staleness."""
+"""Lifecycle check — time decay + state transitions."""
 
 import json
 import re
@@ -19,15 +19,18 @@ DECAY_TIERS = [(180, -0.15), (90, -0.10), (60, -0.05), (30, -0.02)]
 
 def parse_lifecycle():
     if not LIFECYCLE.exists():
-        return {}, []
+        return {}
     text = LIFECYCLE.read_text(encoding="utf-8")
-    pages, outputs, section = {}, [], None
+    pages, section = {}, None
     for line in text.split("\n"):
-        m = re.match(r'^## (Entities|Concepts|Summaries|Comparisons|Synthesis|Output)', line)
+        m = re.match(r'^## (Entities|Concepts|Summaries|Comparisons|Synthesis)', line)
         if m:
             section = m.group(1)
             continue
-        if section and section != "Output" and line.startswith("| [["):
+        if line.startswith("## "):
+            section = None
+            continue
+        if section and line.startswith("| [["):
             parts = [p.strip() for p in line.split("|")]
             if len(parts) >= 5:
                 name = re.sub(r'\[\[|\]\]', '', parts[1])
@@ -36,15 +39,7 @@ def parse_lifecycle():
                     "access": int(parts[2]) if parts[2].isdigit() else 0,
                     "last_accessed": parts[3] if parts[3] else None,
                 }
-        if section == "Output" and line.startswith("| `"):
-            parts = [p.strip() for p in line.split("|")]
-            if len(parts) >= 5:
-                outputs.append({
-                    "file": parts[1].strip("`"),
-                    "status": parts[2],
-                    "wiki_deps": [d.strip() for d in parts[3].split(",")],
-                })
-    return pages, outputs
+    return pages
 
 
 def parse_index():
@@ -98,27 +93,14 @@ def calc_transitions(lc_pages, idx_pages):
             results.append({"page": name, "from": "stale", "to": "archived", "reason": f"{days}d, no new sources"})
     return results
 
-
-def calc_output_staleness(outputs, idx_pages):
-    results = []
-    for o in outputs:
-        if o["status"] == "outdated":
-            continue
-        stale = [d for d in o["wiki_deps"] if d.strip() and idx_pages.get(d.strip(), {}).get("status") in ("stale", "archived")]
-        if stale:
-            results.append({"output": o["file"], "stale_deps": stale})
-    return results
-
-
 def main():
-    lc_pages, outputs = parse_lifecycle()
+    lc_pages = parse_lifecycle()
     idx_pages = parse_index()
     print(json.dumps({
         "date": str(TODAY),
         "tracked_pages": len(lc_pages),
         "decay_suggestions": calc_decay(lc_pages, idx_pages),
         "status_transitions": calc_transitions(lc_pages, idx_pages),
-        "output_staleness": calc_output_staleness(outputs, idx_pages),
     }, ensure_ascii=False, indent=2))
 
 

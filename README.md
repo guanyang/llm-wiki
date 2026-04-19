@@ -24,7 +24,7 @@ Core idea: Knowledge is not derived from scratch on every query — it is **comp
 ├── GEMINI.md          # Schema spec (Gemini CLI adaptation)
 ├── skills/                # Agent Skills (detailed workflow rules, loaded on demand)
 │   └── llm-wiki/          # LLM Wiki skill
-│       ├── SKILL.md       # Four subcommands: ingest/query/lint/publish
+│       ├── SKILL.md       # Five subcommands: ingest/query/lint/publish/refresh
 │       └── references/    # Shared spec documents (7 *-spec.md files)
 ├── raw/               # Raw materials (human-curated, LLM read-only)
 │   ├── articles/      # Web articles, blog posts
@@ -66,6 +66,11 @@ Knowledge doesn't stay valid forever once written. This project introduces a com
 - **Supersession**: When new information explicitly refutes old conclusions, superseded_by/supersedes bidirectional links enable version chain traceability. Old versions are preserved but marked as outdated.
 - **Demotion**: When high-level synthesis is disproven, it is demoted to stale pending re-verification. Lower-level entities and concepts are unaffected.
 
+### Web Re-verification & Fact Preservation
+
+- **Fact Preservation**: The wiki is no longer a sealed black box. During `query` and `lint` workflows, the system probes for outdated or low-confidence information and suggests web re-verification. You can also proactively target a specific knowledge area with `/llm-wiki refresh`.
+- **Core Safeguard**: The system retrieves the latest information via web search, but **new findings must be confirmed by the user and persisted as new files in `raw/`**, which then automatically triggers an Ingest to re-evaluate and refresh stale knowledge in the wiki. This ensures knowledge stays fresh while upholding the immutable "append-only, never modify" principle for raw materials.
+
 ### Layered Consolidation (Four-Tier Memory Model)
 
 Knowledge progressively promotes from lower to higher tiers. Each tier is more compressed, more reliable, and has a longer lifecycle:
@@ -93,9 +98,10 @@ Detailed rules are distilled into [Agent Skills](https://agentskills.io/) (`skil
 | Capability | Description |
 |------|------|
 | **Ingest** | Read materials from raw/, extract entities and concepts, create/update wiki pages, automatically maintain cross-references |
-| **Query** | Answer based on compiled wiki knowledge, prioritize high-confidence pages, archive valuable answers |
+| **Query** | Answer based on compiled wiki knowledge, prioritize high-confidence pages, proactively search the web for stale/low-confidence topics, archive valuable answers |
 | **Lint** | Contradiction detection, orphan pages, missing references, cross-reference integrity, lifecycle decay and state transitions |
 | **Publish** | Produce blog posts, reports, slides, tutorials, briefings, and other standalone deliverables from wiki |
+| **Refresh** | Re-verify a specific topic via web search, compare with existing wiki content, persist updates after user confirmation |
 | **Lifecycle Management** | Confidence scoring, forgetting curve decay, state transitions, supersession/demotion, layered consolidation promotion |
 | **Pluggable Extension** | Lifecycle is an enhancement layer — deleting lifecycle.md does not affect core wiki functionality |
 
@@ -106,9 +112,10 @@ All operations are executed through the `llm-wiki` skill (see `skills/llm-wiki/S
 | Operation | Usage | Description |
 |---|---|---|
 | Ingest | `/llm-wiki ingest <raw/path/file>` | Read material → extract key points → create/update wiki pages → maintain cross-references → update lifecycle |
-| Query | `/llm-wiki query <question>` | Answer based on compiled wiki knowledge, prioritize high-confidence pages, optionally save valuable answers back to wiki |
+| Query | `/llm-wiki query <question>` | Answer based on compiled wiki knowledge, prioritize high-confidence pages, proactively verify stale topics via web search |
 | Lint | `/llm-wiki lint` | Check for contradictions, orphan pages, missing references, lifecycle decay and state transitions — keep wiki healthy |
 | Publish | `/llm-wiki publish <type> [topic]` | Produce polished output from wiki; LLM generates draft, human reviews and finalizes |
+| Refresh | `/llm-wiki refresh <topic>` | Re-verify a specific topic via web search; persist new information to raw/ after user confirmation |
 
 ## Core Principles
 
@@ -119,6 +126,7 @@ All operations are executed through the `llm-wiki` skill (see `skills/llm-wiki/S
 - **Output Layer** (`output/`): Deliverables distilled from wiki — standalone, audience-facing, independently readable
 - Knowledge compound interest: Every operation makes the wiki richer
 - Lifecycle management: Knowledge has temperature — frequently used knowledge warms up, long-dormant knowledge cools down
+- Web re-verification: Query/lint triggers web search on demand, keeping knowledge fresh
 - Detailed specs in [AGENTS.md](AGENTS.md), full workflow in [skills/llm-wiki/SKILL.md](skills/llm-wiki/SKILL.md)
 
 ## Quick Start
@@ -197,6 +205,16 @@ Run a health check on the wiki
 ```
 
 The LLM will check for contradictions, orphan pages, missing concept pages, outdated information, and more.
+
+### 7. Re-verify Topics
+
+When you suspect certain wiki knowledge may be outdated:
+
+```
+Refresh the wiki knowledge about Playwright
+```
+
+The LLM will search the web for latest developments, compare with existing wiki content, and ask you whether to persist updates.
 
 ## Obsidian Configuration Guide
 

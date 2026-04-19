@@ -1,42 +1,24 @@
-# Wiki Lifecycle Registry
+# Wiki Lifecycle
 
-> Detailed lifecycle data — standalone pluggable module
->
-> Last updated: YYYY-MM-DD | Tracked pages: N
->
-> confidence and status have been merged into index.md (high-frequency reads). This file carries low-frequency fields and Output tracking.
+> Last updated: 2026-04-19 | Total pages: 0 | Total materials: 0
 
 ## Entities
 
 | Page | access | last_accessed | superseded_by | supersedes |
 |------|--------|---------------|---------------|------------|
-
+| [[page1]] | 0 | 2026-04-19 | | |
 
 ## Concepts
-
-| Page | access | last_accessed | superseded_by | supersedes |
-|------|--------|---------------|---------------|------------|
+(Same table format as above)
 
 
 ## Summaries
-
-| Page | access | last_accessed | superseded_by | supersedes |
-|------|--------|---------------|---------------|------------|
+(Same table format as above)
 
 
 ## Comparisons
-
-| Page | access | last_accessed | superseded_by | supersedes |
-|------|--------|---------------|---------------|------------|
+(Same table format as above)
 
 
 ## Synthesis
-
-| Page | access | last_accessed | superseded_by | supersedes |
-|------|--------|---------------|---------------|------------|
-
-
-## Output (Deliverable Tracking)
-
-| Deliverable | status | wiki_deps | created |
-|------|--------|-----------|---------|
+(Same table format as above)

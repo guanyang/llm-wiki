@@ -33,13 +33,14 @@
 
 ## Skill
 
-All wiki operations are executed through the `llm-wiki` skill, supporting four subcommands:
+All wiki operations are executed through the `llm-wiki` skill, supporting five subcommands:
 
 ```
 /llm-wiki ingest   — Digest raw material into wiki
 /llm-wiki query    — Retrieve knowledge from wiki
 /llm-wiki lint     — Check wiki health
 /llm-wiki publish  — Produce polished output from wiki
+/llm-wiki refresh  — Re-verify a specific topic via web search
 ```
 
 Full workflow definition: `skills/llm-wiki/SKILL.md`
@@ -68,3 +69,4 @@ Full workflow definition: `skills/llm-wiki/SKILL.md`
 6. **Complete Logging**: All operations recorded in log.md
 7. **Progressive Evolution**: Schema co-maintained by humans and LLM
 8. **Progressive Disclosure**: Detailed rules are distilled into skill references, loaded on demand
+9. **Web Re-verification**: Query/lint triggers web search on demand; new information is appended to raw/ only after user confirmation

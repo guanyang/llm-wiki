@@ -15,10 +15,21 @@ Operation log, append-only — never modify existing entries. Only keep the most
 - Output: [[comparison-page]] (saved to wiki)
 
 ## [YYYY-MM-DD] lint | Health Check
+- Updated: [[page3]] (added xxx section)
+- Check results:
+  - xxx
+- Fix actions:
+  - xxx
 - Fixed: N items | Pending: M items
 
 ## [YYYY-MM-DD] publish | Deliverable Title
 - Type: post | report | slides | tutorial | newsletter
 - Output: `output/posts/filename.md`
-- Status: draft | reviewed
+- Sources: [[page1]], [[page2]]
+
+## [YYYY-MM-DD] refresh | Topic
+- Source: `url`
+- Created: [[page1]], [[page2]]
+- Updated: [[page3]] (added xxx section)
+
 ```
